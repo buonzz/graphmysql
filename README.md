@@ -36,8 +36,6 @@ USAGE
 <!-- usagestop -->
 # Commands
 <!-- commands -->
-* [`graphmysql hello PERSON`](#graphmysql-hello-person)
-* [`graphmysql hello world`](#graphmysql-hello-world)
 * [`graphmysql help [COMMANDS]`](#graphmysql-help-commands)
 * [`graphmysql plugins`](#graphmysql-plugins)
 * [`graphmysql plugins:install PLUGIN...`](#graphmysql-pluginsinstall-plugin)
@@ -49,48 +47,6 @@ USAGE
 * [`graphmysql plugins:uninstall PLUGIN...`](#graphmysql-pluginsuninstall-plugin-1)
 * [`graphmysql plugins:uninstall PLUGIN...`](#graphmysql-pluginsuninstall-plugin-2)
 * [`graphmysql plugins update`](#graphmysql-plugins-update)
-
-## `graphmysql hello PERSON`
-
-Say hello
-
-```
-USAGE
-  $ graphmysql hello PERSON -f <value>
-
-ARGUMENTS
-  PERSON  Person to say hello to
-
-FLAGS
-  -f, --from=<value>  (required) Who is saying hello
-
-DESCRIPTION
-  Say hello
-
-EXAMPLES
-  $ oex hello friend --from oclif
-  hello friend from oclif! (./src/commands/hello/index.ts)
-```
-
-_See code: [src/commands/hello/index.ts](https://github.com/buonzz/graphmysql/blob/v0.0.0/src/commands/hello/index.ts)_
-
-## `graphmysql hello world`
-
-Say hello world
-
-```
-USAGE
-  $ graphmysql hello world
-
-DESCRIPTION
-  Say hello world
-
-EXAMPLES
-  $ graphmysql hello world
-  hello world! (./src/commands/hello/world.ts)
-```
-
-_See code: [src/commands/hello/world.ts](https://github.com/buonzz/graphmysql/blob/v0.0.0/src/commands/hello/world.ts)_
 
 ## `graphmysql help [COMMANDS]`
 
