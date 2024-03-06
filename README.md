@@ -8,14 +8,6 @@ Display MySQL objects in a graph
 [![GitHub license](https://img.shields.io/github/license/oclif/hello-world)](https://github.com/oclif/hello-world/blob/main/LICENSE)
 
 
-### dev
-
-```
-npm run build
-./bin/run.js explore db 127.0.0.1 'pass' root > graph.json
-./bin/run.js serve ./graph.json 8086
-```
-
 <!-- toc -->
 * [Usage](#usage)
 * [Commands](#commands)
@@ -27,7 +19,7 @@ $ npm install -g graphmysql
 $ graphmysql COMMAND
 running command...
 $ graphmysql (--version)
-graphmysql/0.0.0 darwin-x64 node-v20.11.0
+graphmysql/1.0.0 darwin-x64 node-v20.11.0
 $ graphmysql --help [COMMAND]
 USAGE
   $ graphmysql COMMAND
@@ -36,6 +28,7 @@ USAGE
 <!-- usagestop -->
 # Commands
 <!-- commands -->
+* [`graphmysql explore DATABASE HOST PASSWORD USERNAME`](#graphmysql-explore-database-host-password-username)
 * [`graphmysql help [COMMANDS]`](#graphmysql-help-commands)
 * [`graphmysql plugins`](#graphmysql-plugins)
 * [`graphmysql plugins:install PLUGIN...`](#graphmysql-pluginsinstall-plugin)
@@ -47,6 +40,30 @@ USAGE
 * [`graphmysql plugins:uninstall PLUGIN...`](#graphmysql-pluginsuninstall-plugin-1)
 * [`graphmysql plugins:uninstall PLUGIN...`](#graphmysql-pluginsuninstall-plugin-2)
 * [`graphmysql plugins update`](#graphmysql-plugins-update)
+* [`graphmysql serve GRAPH PORT`](#graphmysql-serve-graph-port)
+
+## `graphmysql explore DATABASE HOST PASSWORD USERNAME`
+
+Connect to MySQL database and generate a json graph data.
+
+```
+USAGE
+  $ graphmysql explore DATABASE HOST PASSWORD USERNAME
+
+ARGUMENTS
+  DATABASE  MySQL database
+  HOST      MySQL Host
+  PASSWORD  MySQL password
+  USERNAME  MySQL username
+
+DESCRIPTION
+  Connect to MySQL database and generate a json graph data.
+
+EXAMPLES
+  $ graphmysql explore your_db 127.0.0.1 yourpassword youruser > graph.json
+```
+
+_See code: [src/commands/explore/index.ts](https://github.com/buonzz/graphmysql/blob/v1.0.0/src/commands/explore/index.ts)_
 
 ## `graphmysql help [COMMANDS]`
 
@@ -346,4 +363,39 @@ DESCRIPTION
 ```
 
 _See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v4.2.6/src/commands/plugins/update.ts)_
+
+## `graphmysql serve GRAPH PORT`
+
+Render Graph data to a simple HTTP Server.
+
+```
+USAGE
+  $ graphmysql serve GRAPH PORT
+
+ARGUMENTS
+  GRAPH  Path to a JSON file that constains the graph data
+  PORT   which port to serve the http server
+
+DESCRIPTION
+  Render Graph data to a simple HTTP Server.
+
+EXAMPLES
+  $ graphmysql serve ./graph.json 8086
+```
+
+_See code: [src/commands/serve/index.ts](https://github.com/buonzz/graphmysql/blob/v1.0.0/src/commands/serve/index.ts)_
 <!-- commandsstop -->
+
+### dev
+
+```
+npm run build
+./bin/run.js explore db 127.0.0.1 'pass' root > graph.json
+./bin/run.js serve ./graph.json 8086
+```
+
+### deploy
+
+```
+npx oclif pack tarballs
+```
