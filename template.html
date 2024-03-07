@@ -1,32 +1,45 @@
 <!DOCTYPE html>
     <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-        <style type="text/css">
-            .main-wrapper {
-                height: 100%;  
-                height: 100%;  
-            }
-            .node { font-family: var(--bs-font-sans-serif);}
-            .link { stroke: #999; stroke-opacity: .6; stroke-width: 1px; font-family: var(--bs-font-sans-serif); }
-        </style>
-    </head>
-    <body>      
-          <main class="container-fluid">
-            <div class="main-wrapper">
-                <svg width="2560" height="1440"></svg>
-              </div>
-          </main>
+        <head>
+            <meta charset="utf-8">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+            <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
+            <style type="text/css">
+                .main-wrapper {
+                    height: 100%;  
+                    height: 100%;  
+                }
+                .node { font-family: var(--bs-font-sans-serif);}
+                .link { stroke: #999; stroke-opacity: .6; stroke-width: 1px; font-family: var(--bs-font-sans-serif); }
+            </style>
+        </head>
+    <body>  
+
+    <main class="container-fluid">
+    <div class="main-wrapper">
+        <div style="position:absolute;top:10px;left:10px;">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#settingsModal">
+            <i class="fa-solid fa-gear"></i>
+            </button>
+        </div>
+
+        <svg width="2560" height="1440"></svg>
+        </div>
+    </main>
     
     <script src="http://d3js.org/d3.v4.min.js" type="text/javascript"></script>
     <script src="http://d3js.org/d3-selection-multi.v1.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     
     <script type="text/javascript">
-    
+
+        var gNodes = [];
+        var gLinks = [];
+
         var colors = d3.scaleOrdinal(d3.schemeCategory10);
     
         var svg = d3.select("svg"),
@@ -52,25 +65,27 @@
         var simulation = d3.forceSimulation()
             .force("link", d3.forceLink().id(function (d) {return d.id;}).distance(500).strength(1))
             .force("charge", d3.forceManyBody())
-            .force("center", d3.forceCenter(width / 2, height / 2));
+            .force("center", d3.forceCenter(400, 400));
     
     
             d3.json("graph.json", function (error, graph) {
                 if (error) throw error;
 
-                var links = graph.links;
-                var nodes = graph.nodes;
+                gLinks = structuredClone(graph.links);
+                gNodes = structuredClone(graph.nodes);
 
-                var selected_nodes = nodes.slice(0, 10);
+                // initially display only the top 10 nodes
+                var selected_nodes = gNodes.slice(0, 10);
 
                 // remove link.source and link.target that is not present in selected nodes
-                var selected_links = links.filter(link => selected_nodes.some(node => link.source == node.id));
+                var selected_links = gLinks.filter(link => selected_nodes.some(node => link.source == node.id));
                     selected_links = selected_links.filter(link => selected_nodes.some(node => link.target == node.id));
 
                 update(selected_links, selected_nodes);
-            })
 
-        //update(data.links, data.nodes);
+                render_settings(gNodes, selected_nodes);
+
+            })
     
         function update(links, nodes) {
             link = svg.selectAll(".link")
@@ -183,7 +198,76 @@
             d.fy = d3.event.y;
         }
     
+        function render_settings(nodes, selected){
+
+            var shtml = '<div class="row">';
+            for (const node of nodes) { 
+                let checked = selected.some(el => (el.id === node.id));
+                shtml += `<div class="col-4">
+                        <div class="form-check">
+                            <input class="form-check-input" id="${node.id}" type="checkbox" value="${node.id}" ${ checked ? 'checked="checked"' : ''}>
+                            <label class="form-check-label" for="${node.id}">
+                                ${node.name}
+                            </label>
+                        </div>
+                    </div>`;
+            }
+
+            shtml +=  '</div>';
+
+            $('#settings').html(shtml);
+        }
+
+        $(function(){
+
+            $('#btnUpdateGraph').click(function(){
+                
+                let selected_node_ids = $("#settingsForm input:checkbox:checked").map(function(){
+                                                                            return $(this).val();
+                                                                            }).get();
+
+                var selected_nodes = gNodes.filter(node => selected_node_ids.some(node_id => node.id == node_id));
+                var selected_links = [];
+
+                // remove link.source and link.target that is not present in selected nodes
+                for (const link of gLinks) {
+                    if(selected_node_ids.some(node_id => node_id == link.source.id) && 
+                       selected_node_ids.some(node_id => node_id == link.target.id))
+                        selected_links.push(link);
+                }  
+
+                if(selected_links.length > 0 && selected_nodes.length>0){
+                    d3.select("svg").selectAll("*").remove();
+                    update(selected_links, selected_nodes);
+                    simulation.restart();
+                    $('#settingsModal').modal('hide');
+                }
+            });
+
+        });
     </script>
+
+    <!-- Modal -->
+    <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="settingsModalLabel">Graph Settings</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="settingsForm">
+                        <div id="settings" class="container">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" id="btnUpdateGraph" class="btn btn-primary">Update Graph</button>
+                </div>
+            </div>
+        </div>
+    </div>
     
     </body>
     </html>
