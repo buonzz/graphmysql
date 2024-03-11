@@ -23,11 +23,7 @@ export default class Serve extends Command {
     let filename = '';
     const appRoot = __filename.replace('dist/commands/serve/index.js' , '');
 
-    console.log(appRoot);
-
-
-        filename =  appRoot+ 'template.html';
-
+    filename =  appRoot+ 'template.html';
 
     const data = fs.readFileSync(args.graph,'utf8');
     let template = fs.readFileSync(filename,'utf8');
