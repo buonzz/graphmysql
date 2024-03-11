@@ -37,8 +37,10 @@
     
     <script type="text/javascript">
 
-        var gNodes = [];
-        var gLinks = [];
+        var data = DATA;
+
+        var gNodes = structuredClone(data.nodes);
+        var gLinks = structuredClone(data.links);
 
         var colors = d3.scaleOrdinal(d3.schemeCategory10);
     
@@ -66,26 +68,19 @@
             .force("link", d3.forceLink().id(function (d) {return d.id;}).distance(500).strength(1))
             .force("charge", d3.forceManyBody())
             .force("center", d3.forceCenter(400, 400));
-    
-    
-            d3.json("graph.json", function (error, graph) {
-                if (error) throw error;
 
-                gLinks = structuredClone(graph.links);
-                gNodes = structuredClone(graph.nodes);
+        function init(){
+            // initially display only the top 10 nodes
+            var selected_nodes = gNodes.slice(0, 10);
 
-                // initially display only the top 10 nodes
-                var selected_nodes = gNodes.slice(0, 10);
+            // remove link.source and link.target that is not present in selected nodes
+            var selected_links = gLinks.filter(link => selected_nodes.some(node => link.source == node.id));
+                selected_links = selected_links.filter(link => selected_nodes.some(node => link.target == node.id));
 
-                // remove link.source and link.target that is not present in selected nodes
-                var selected_links = gLinks.filter(link => selected_nodes.some(node => link.source == node.id));
-                    selected_links = selected_links.filter(link => selected_nodes.some(node => link.target == node.id));
+            update(selected_links, selected_nodes);
 
-                update(selected_links, selected_nodes);
-
-                render_settings(gNodes, selected_nodes);
-
-            })
+            render_settings(gNodes, selected_nodes);
+        }
     
         function update(links, nodes) {
             link = svg.selectAll(".link")
@@ -243,6 +238,9 @@
                     $('#settingsModal').modal('hide');
                 }
             });
+
+            // start 
+            init();
 
         });
     </script>
