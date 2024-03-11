@@ -226,10 +226,10 @@
 
                 // remove link.source and link.target that is not present in selected nodes
                 for (const link of gLinks) {
-                    if(selected_node_ids.some(node_id => node_id == link.source.id) && 
-                       selected_node_ids.some(node_id => node_id == link.target.id))
+                    if(selected_node_ids.some(node_id => node_id == link.source.id || node_id == link.source) && 
+                       selected_node_ids.some(node_id => node_id == link.target.id || node_id == link.target))
                         selected_links.push(link);
-                }  
+                }    
 
                 if(selected_links.length > 0 && selected_nodes.length>0){
                     d3.select("svg").selectAll("*").remove();
