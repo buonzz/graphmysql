@@ -255,54 +255,64 @@
                     simulation.restart();
                 }
 
-$('#settingsModal').modal('hide');
-});
+        $('#settingsModal').modal('hide');
+        });
 
-$('#btnSortAmountDesc').click(function(){
+        $('#btnSortAmountDesc').click(function(){
 
-var params = retrieve_selected();
+        var params = retrieve_selected();
 
-gNodes.sort((a,b) => a.referenceCount - b.referenceCount );
+        gNodes.sort((a,b) => a.referenceCount - b.referenceCount );
 
-update(params.selected_links, params.selected_nodes);
+        update(params.selected_links, params.selected_nodes);
 
-render_settings(gNodes, params.selected_nodes);
+        render_settings(gNodes, params.selected_nodes);
 
-});
+        });
 
-$('#btnSortAmountAsc').click(function(){
+        $('#btnSortAmountAsc').click(function(){
 
-var params = retrieve_selected();
+        var params = retrieve_selected();
 
-gNodes.sort((a,b) => b.referenceCount - a.referenceCount );
+        gNodes.sort((a,b) => b.referenceCount - a.referenceCount );
 
-update(params.selected_links, params.selected_nodes);
+        update(params.selected_links, params.selected_nodes);
 
-render_settings(gNodes, params.selected_nodes);
+        render_settings(gNodes, params.selected_nodes);
 
-});
+        });
 
-$('#btnSortAlphaDesc').click(function(){
+        $('#btnSortAlphaDesc').click(function(){
 
-var params = retrieve_selected();
+        var params = retrieve_selected();
 
-gNodes.sort((a,b) => (a.id < b.id) ? 1 : ((b.id < a.id) ? -1 : 0))
+        gNodes.sort((a,b) => (a.id < b.id) ? 1 : ((b.id < a.id) ? -1 : 0))
 
-update(params.selected_links, params.selected_nodes);
+        update(params.selected_links, params.selected_nodes);
 
-render_settings(gNodes, params.selected_nodes);
+        render_settings(gNodes, params.selected_nodes);
 
-});
+        });
 
-$('#btnSortAlphaAsc').click(function(){
+        $('#btnSortAlphaAsc').click(function(){
 
-var params = retrieve_selected();
+        var params = retrieve_selected();
 
-gNodes.sort((a,b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0))
+        gNodes.sort((a,b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0))
 
-update(params.selected_links, params.selected_nodes);
+        update(params.selected_links, params.selected_nodes);
 
-render_settings(gNodes, params.selected_nodes);
+        render_settings(gNodes, params.selected_nodes);
+
+        });
+
+        $('#txtFilter').keyup(function () { 
+        var val = $(this).val();
+
+            if(val.length > 0)
+            $("#settingsForm input:not([value^="+ val+"])").parent().parent().hide();
+            else
+                $("#settingsForm input[type=checkbox]").parent().parent().show();
 
             });
 
@@ -322,9 +332,12 @@ render_settings(gNodes, params.selected_nodes);
                 </div>
                 <div class="modal-body">
 
-                    <div class='row g-0'>
+                    <div class='row g-0 mb-5'>
                         <div class='col-md-5 w-auto ms-auto'>
                             <div class="btn-toolbar" role="toolbar">
+                                <div class="input-group mx-2">
+                                    <input type="text" class="form-control" id="txtFilter">
+                                </div>
                                 <div class="btn-group me-2" role="group">
                                     <button type="button" class="btn btn-secondary" id="btnSortAmountDesc"><i class="fa fa-sort-numeric-desc" aria-hidden="true"></i></button>
                                     <button type="button" class="btn btn-secondary" id="btnSortAmountAsc"><i class="fa fa-sort-numeric-asc" aria-hidden="true"></i></button>
@@ -336,7 +349,7 @@ render_settings(gNodes, params.selected_nodes);
                     </div>
 
                     <form id="settingsForm">
-                        <div id="settings" class="container">
+                        <div id="settings" class="container m-t-5">
                         </div>
                     </form>
                 </div>
@@ -350,4 +363,5 @@ render_settings(gNodes, params.selected_nodes);
     
     </body>
     </html>
-    
+
+
