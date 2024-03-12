@@ -231,7 +231,7 @@
                         selected_links.push(link);
                 }    
 
-                if(selected_links.length > 0 && selected_nodes.length>0){
+                if(selected_links.length > 0 || selected_nodes.length>0){
                     d3.select("svg").selectAll("*").remove();
                     update(selected_links, selected_nodes);
                     simulation.restart();

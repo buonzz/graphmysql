@@ -107,6 +107,7 @@ docker run -d -p 3306:3306 --name mysql-sakila sakiladb/mysql:5.7
 npm run build
 ./bin/run.js explore sakila 127.0.0.1 'p_ssW0rd' sakila > graph.json
 ./bin/run.js serve ./graph.json 8086
+./bin/run.js build ./graph.json > graph.html
 ```
 
 ### deploy
