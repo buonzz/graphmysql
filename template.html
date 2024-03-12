@@ -204,6 +204,7 @@
                             <label class="form-check-label" for="${node.id}">
                                 ${node.name}
                             </label>
+                            <span class="badge rounded-pill bg-info text-dark">${node.referenceCount}</span>
                         </div>
                     </div>`;
             }
@@ -211,6 +212,22 @@
             shtml +=  '</div>';
 
             $('#settings').html(shtml);
+        }
+
+        function retrieve_selected(){
+            let selected_node_ids = $("#settingsForm input:checkbox:checked").map(function(){
+                                                                            return $(this).val();
+                                                                            }).get();
+
+                var selected_nodes = gNodes.filter(node => selected_node_ids.some(node_id => node.id == node_id));
+
+                // remove link.source and link.target that is not present in selected nodes
+                var selected_links = gLinks.filter(link => selected_nodes.some(node => link.source == node.id));
+                    selected_links = selected_links.filter(link => selected_nodes.some(node => link.target == node.id));
+            return {
+                selected_nodes,
+                selected_links
+            };
         }
 
         $(function(){
@@ -231,12 +248,62 @@
                         selected_links.push(link);
                 }    
 
+                d3.select("svg").selectAll("*").remove();
+
                 if(selected_links.length > 0 || selected_nodes.length>0){
-                    d3.select("svg").selectAll("*").remove();
                     update(selected_links, selected_nodes);
                     simulation.restart();
-                    $('#settingsModal').modal('hide');
                 }
+
+$('#settingsModal').modal('hide');
+});
+
+$('#btnSortAmountDesc').click(function(){
+
+var params = retrieve_selected();
+
+gNodes.sort((a,b) => a.referenceCount - b.referenceCount );
+
+update(params.selected_links, params.selected_nodes);
+
+render_settings(gNodes, params.selected_nodes);
+
+});
+
+$('#btnSortAmountAsc').click(function(){
+
+var params = retrieve_selected();
+
+gNodes.sort((a,b) => b.referenceCount - a.referenceCount );
+
+update(params.selected_links, params.selected_nodes);
+
+render_settings(gNodes, params.selected_nodes);
+
+});
+
+$('#btnSortAlphaDesc').click(function(){
+
+var params = retrieve_selected();
+
+gNodes.sort((a,b) => (a.id < b.id) ? 1 : ((b.id < a.id) ? -1 : 0))
+
+update(params.selected_links, params.selected_nodes);
+
+render_settings(gNodes, params.selected_nodes);
+
+});
+
+$('#btnSortAlphaAsc').click(function(){
+
+var params = retrieve_selected();
+
+gNodes.sort((a,b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0))
+
+update(params.selected_links, params.selected_nodes);
+
+render_settings(gNodes, params.selected_nodes);
+
             });
 
             // start 
@@ -254,6 +321,20 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+
+                    <div class='row g-0'>
+                        <div class='col-md-5 w-auto ms-auto'>
+                            <div class="btn-toolbar" role="toolbar">
+                                <div class="btn-group me-2" role="group">
+                                    <button type="button" class="btn btn-secondary" id="btnSortAmountDesc"><i class="fa fa-sort-numeric-desc" aria-hidden="true"></i></button>
+                                    <button type="button" class="btn btn-secondary" id="btnSortAmountAsc"><i class="fa fa-sort-numeric-asc" aria-hidden="true"></i></button>
+                                    <button type="button" class="btn btn-secondary" id="btnSortAlphaAsc"><i class="fa fa-sort-alpha-asc" aria-hidden="true"></i></button>
+                                    <button type="button" class="btn btn-secondary" id="btnSortAlphaDesc"><i class="fa fa-sort-alpha-desc" aria-hidden="true"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <form id="settingsForm">
                         <div id="settings" class="container">
                         </div>
@@ -269,3 +350,4 @@
     
     </body>
     </html>
+    
