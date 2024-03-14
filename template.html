@@ -317,8 +317,16 @@
 
         });
 
-            // start 
-            init();
+        $('#btnSelectAll').click(function(){
+            $('#settingsForm input[type=checkbox]').prop('checked', true);
+         });
+
+         $('#btnUnselectAll').click(function(){
+            $('#settingsForm input[type=checkbox]').prop('checked', false);
+         });
+
+        // start 
+        init();
 
         });
     </script>
@@ -344,6 +352,11 @@
                                     <button type="button" class="btn btn-secondary" id="btnSortAmountAsc"><i class="fa fa-sort-numeric-asc" aria-hidden="true"></i></button>
                                     <button type="button" class="btn btn-secondary" id="btnSortAlphaAsc"><i class="fa fa-sort-alpha-asc" aria-hidden="true"></i></button>
                                     <button type="button" class="btn btn-secondary" id="btnSortAlphaDesc"><i class="fa fa-sort-alpha-desc" aria-hidden="true"></i></button>
+                                </div>
+
+                                <div class="btn-group me-2" role="group">
+                                    <button type="button" class="btn btn-secondary" id="btnSelectAll"><i class="fa fa-check" aria-hidden="true"></i></button>
+                                    <button type="button" class="btn btn-secondary" id="btnUnselectAll"><i class="fa fa-times" aria-hidden="true"></i></button>
                                 </div>
                             </div>
                         </div>
