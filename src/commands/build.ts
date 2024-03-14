@@ -10,7 +10,7 @@ export default class Build extends Command {
   static description = 'generate a static html file that allows you to browse graph data'
 
   static examples = [
-    `$ graphmysql build ./graph.json 8086`,
+    `$ graphmysql build ./graph.json`,
   ]
 
   static flags = {
