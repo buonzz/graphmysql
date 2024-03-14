@@ -14,7 +14,7 @@ $ npm install -g graphmysql
 $ graphmysql COMMAND
 running command...
 $ graphmysql (--version)
-graphmysql/1.0.1 darwin-x64 node-v20.11.0
+graphmysql/1.0.2 darwin-x64 node-v20.11.0
 $ graphmysql --help [COMMAND]
 USAGE
   $ graphmysql COMMAND
@@ -56,7 +56,7 @@ EXAMPLES
   $ graphmysql build ./graph.json 8086
 ```
 
-_See code: [src/commands/build.ts](https://github.com/buonzz/graphmysql/blob/v1.0.1/src/commands/build.ts)_
+_See code: [src/commands/build.ts](https://github.com/buonzz/graphmysql/blob/v1.0.2/src/commands/build.ts)_
 
 ## `graphmysql explore DATABASE HOST PASSWORD USERNAME`
 
@@ -79,7 +79,7 @@ EXAMPLES
   $ graphmysql explore your_db 127.0.0.1 yourpassword youruser > graph.json
 ```
 
-_See code: [src/commands/explore/index.ts](https://github.com/buonzz/graphmysql/blob/v1.0.1/src/commands/explore/index.ts)_
+_See code: [src/commands/explore/index.ts](https://github.com/buonzz/graphmysql/blob/v1.0.2/src/commands/explore/index.ts)_
 
 ## `graphmysql help [COMMANDS]`
 
@@ -399,7 +399,7 @@ EXAMPLES
   $ graphmysql serve ./graph.json 8086
 ```
 
-_See code: [src/commands/serve/index.ts](https://github.com/buonzz/graphmysql/blob/v1.0.1/src/commands/serve/index.ts)_
+_See code: [src/commands/serve/index.ts](https://github.com/buonzz/graphmysql/blob/v1.0.2/src/commands/serve/index.ts)_
 <!-- commandsstop -->
 
 ### Sample database
