@@ -421,6 +421,13 @@ npm run build
 
 ### deploy
 
+if non-npm
 ```
 npx oclif pack tarballs
+```
+
+via npm
+```
+npm version (major|minor|patch) # bumps version, updates README, adds git tag
+npm publish
 ```

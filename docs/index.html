@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+    <html lang="en">
+        <head>
+            <meta charset="utf-8">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>graphmysql - demo for Sakila database</title>
+            <meta property="og:title" content="graphmysql - demo for Sakila database">
+            <meta property="og:description" content="graphysql is a cli tool that analyze relationships of your tables then display it in a beautiful network of nodes that you can interact with.">
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+            <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
+            <style type="text/css">
+                .main-wrapper {
+                    height: 100%;  
+                    height: 100%;  
+                }
+                .node { font-family: var(--bs-font-sans-serif);}
+                .link { stroke: #999; stroke-opacity: .6; stroke-width: 1px; font-family: var(--bs-font-sans-serif); }
+
+                #controls{
+                    position:absolute;
+                    top: 0;
+                    left: 0;
+                    padding-top: 15px;
+                    padding-left: 15px;
+                    position: -webkit-sticky;
+                    position: sticky;
+                    display: inline;
+                    width: 100%;
+                }
+            </style>
+        </head>
+    <body>  
+
+    <main class="container-fluid">
+    <div class="main-wrapper">
+        <div id="controls">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#settingsModal">
+            <i class="fa-solid fa-gear"></i>
+            </button>
+<button type="button" id="btnUp" class="btn btn-secondary">
+                <i class="fa fa-arrow-up"></i>
+            </button>
+            <button type="button" id="btnDown" class="btn btn-secondary">
+                <i class="fa fa-arrow-down"></i>
+            </button>
+            <button type="button" id="btnLeft" class="btn btn-secondary">
+                <i class="fa fa-arrow-left"></i>
+            </button>
+            <button type="button" id="btnRight" class="btn btn-secondary">
+                <i class="fa fa-arrow-right"></i>
+            </button>
+            <button type="button" id="btnZoomIn" class="btn btn-secondary">
+                <i class="fa fa-plus"></i>
+            </button>
+            <button type="button" id="btnZoomOut" class="btn btn-secondary">
+                <i class="fa fa-minus"></i>
+            </button>
+            <button type="button" id="btnRefresh" class="btn btn-secondary">
+                <i class="fa fa-refresh"></i>
+            </button>
+        </div>
+
+        <svg width="1280" height="960"></svg>
+        </div>
+    </main>
+    
+    <script src="http://d3js.org/d3.v4.min.js" type="text/javascript"></script>
+    <script src="http://d3js.org/d3-selection-multi.v1.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://rawgit.com/DanielHoffmann/jquery-svg-pan-zoom/master/compiled/jquery.svg.pan.zoom.js"></script>
+    
+    <script type="text/javascript">
+
+        var data = {
+    "links": [
+        {
+            "source": "address",
+            "target": "city",
+            "type": "city_id = city_id"
+        },
+        {
+            "source": "city",
+            "target": "country",
+            "type": "country_id = country_id"
+        },
+        {
+            "source": "customer",
+            "target": "address",
+            "type": "address_id = address_id"
+        },
+        {
+            "source": "customer",
+            "target": "store",
+            "type": "store_id = store_id"
+        },
+        {
+            "source": "film",
+            "target": "language",
+            "type": "language_id = language_id"
+        },
+        {
+            "source": "film",
+            "target": "language",
+            "type": "original_language_id = language_id"
+        },
+        {
+            "source": "film_actor",
+            "target": "actor",
+            "type": "actor_id = actor_id"
+        },
+        {
+            "source": "film_actor",
+            "target": "film",
+            "type": "film_id = film_id"
+        },
+        {
+            "source": "film_category",
+            "target": "category",
+            "type": "category_id = category_id"
+        },
+        {
+            "source": "film_category",
+            "target": "film",
+            "type": "film_id = film_id"
+        },
+        {
+            "source": "inventory",
+            "target": "film",
+            "type": "film_id = film_id"
+        },
+        {
+            "source": "inventory",
+            "target": "store",
+            "type": "store_id = store_id"
+        },
+        {
+            "source": "payment",
+            "target": "customer",
+            "type": "customer_id = customer_id"
+        },
+        {
+            "source": "payment",
+            "target": "rental",
+            "type": "rental_id = rental_id"
+        },
+        {
+            "source": "payment",
+            "target": "staff",
+            "type": "staff_id = staff_id"
+        },
+        {
+            "source": "rental",
+            "target": "customer",
+            "type": "customer_id = customer_id"
+        },
+        {
+            "source": "rental",
+            "target": "inventory",
+            "type": "inventory_id = inventory_id"
+        },
+        {
+            "source": "rental",
+            "target": "staff",
+            "type": "staff_id = staff_id"
+        },
+        {
+            "source": "staff",
+            "target": "address",
+            "type": "address_id = address_id"
+        },
+        {
+            "source": "staff",
+            "target": "store",
+            "type": "store_id = store_id"
+        },
+        {
+            "source": "store",
+            "target": "address",
+            "type": "address_id = address_id"
+        },
+        {
+            "source": "store",
+            "target": "staff",
+            "type": "manager_staff_id = staff_id"
+        }
+    ],
+    "nodes": [
+        {
+            "id": "address",
+            "name": "address",
+            "referenceCount": 3
+        },
+        {
+            "id": "film",
+            "name": "film",
+            "referenceCount": 3
+        },
+        {
+            "id": "staff",
+            "name": "staff",
+            "referenceCount": 3
+        },
+        {
+            "id": "store",
+            "name": "store",
+            "referenceCount": 3
+        },
+        {
+            "id": "customer",
+            "name": "customer",
+            "referenceCount": 2
+        },
+        {
+            "id": "language",
+            "name": "language",
+            "referenceCount": 2
+        },
+        {
+            "id": "actor",
+            "name": "actor",
+            "referenceCount": 1
+        },
+        {
+            "id": "category",
+            "name": "category",
+            "referenceCount": 1
+        },
+        {
+            "id": "city",
+            "name": "city",
+            "referenceCount": 1
+        },
+        {
+            "id": "country",
+            "name": "country",
+            "referenceCount": 1
+        },
+        {
+            "id": "inventory",
+            "name": "inventory",
+            "referenceCount": 1
+        },
+        {
+            "id": "rental",
+            "name": "rental",
+            "referenceCount": 1
+        },
+        {
+            "id": "actor_info",
+            "name": "actor_info",
+            "referenceCount": 0
+        },
+        {
+            "id": "customer_list",
+            "name": "customer_list",
+            "referenceCount": 0
+        },
+        {
+            "id": "film_actor",
+            "name": "film_actor",
+            "referenceCount": 0
+        },
+        {
+            "id": "film_category",
+            "name": "film_category",
+            "referenceCount": 0
+        },
+        {
+            "id": "film_list",
+            "name": "film_list",
+            "referenceCount": 0
+        },
+        {
+            "id": "film_text",
+            "name": "film_text",
+            "referenceCount": 0
+        },
+        {
+            "id": "nicer_but_slower_film_list",
+            "name": "nicer_but_slower_film_list",
+            "referenceCount": 0
+        },
+        {
+            "id": "payment",
+            "name": "payment",
+            "referenceCount": 0
+        },
+        {
+            "id": "sales_by_film_category",
+            "name": "sales_by_film_category",
+            "referenceCount": 0
+        },
+        {
+            "id": "sales_by_store",
+            "name": "sales_by_store",
+            "referenceCount": 0
+        },
+        {
+            "id": "staff_list",
+            "name": "staff_list",
+            "referenceCount": 0
+        }
+    ]
+}
+;
+
+        var gNodes = structuredClone(data.nodes);
+        var gLinks = structuredClone(data.links);
+
+        var colors = d3.scaleOrdinal(d3.schemeCategory10);
+    
+        var svg = d3.select("svg"),
+            width = +svg.attr("width"),
+            height = +svg.attr("height"),
+            node,
+            link;
+    
+        svg.append('defs').append('marker')
+            .attrs({'id':'arrowhead',
+                'viewBox':'-0 -5 10 10',
+                'refX':13,
+                'refY':0,
+                'orient':'auto',
+                'markerWidth':13,
+                'markerHeight':13,
+                'xoverflow':'visible'})
+            .append('svg:path')
+            .attr('d', 'M 0,-5 L 10 ,0 L 0,5')
+            .attr('fill', '#999')
+            .style('stroke','none');
+    
+        var simulation = d3.forceSimulation()
+            .force("link", d3.forceLink().id(function (d) {return d.id;}).distance(500).strength(1))
+            .force("charge", d3.forceManyBody())
+            .force("center", d3.forceCenter(400, 400));
+
+        function init(){
+            // initially display only the top 10 nodes
+            var selected_nodes = gNodes.slice(0, 10);
+
+            // remove link.source and link.target that is not present in selected nodes
+            var selected_links = gLinks.filter(link => selected_nodes.some(node => link.source == node.id));
+                selected_links = selected_links.filter(link => selected_nodes.some(node => link.target == node.id));
+
+            update(selected_links, selected_nodes);
+
+            render_settings(gNodes, selected_nodes);
+        }
+    
+        function update(links, nodes) {
+            link = svg.selectAll(".link")
+                .data(links)
+                .enter()
+                .append("line")
+                .attr("class", "link")
+                .attr('marker-end','url(#arrowhead)')
+    
+            link.append("title")
+                .text(function (d) {return d.type;});
+    
+            edgepaths = svg.selectAll(".edgepath")
+                .data(links)
+                .enter()
+                .append('path')
+                .attrs({
+                    'class': 'edgepath',
+                    'fill-opacity': 0,
+                    'stroke-opacity': 0,
+                    'id': function (d, i) {return 'edgepath' + i}
+                })
+                .style("pointer-events", "none");
+    
+            edgelabels = svg.selectAll(".edgelabel")
+                .data(links)
+                .enter()
+                .append('text')
+                .style("pointer-events", "none")
+                .attrs({
+                    'class': 'edgelabel',
+                    'id': function (d, i) {return 'edgelabel' + i},
+                    'font-size': 10,
+                    'fill': '#aaa'
+                });
+    
+            edgelabels.append('textPath')
+                .attr('xlink:href', function (d, i) {return '#edgepath' + i})
+                .style("text-anchor", "middle")
+                .style("pointer-events", "none")
+                .attr("startOffset", "50%")
+                .text(function (d) {return d.type});
+    
+            node = svg.selectAll(".node")
+                .data(nodes)
+                .enter()
+                .append("g")
+                .attr("class", "node")
+                .call(d3.drag()
+                        .on("start", dragstarted)
+                        .on("drag", dragged)
+                        //.on("end", dragended)
+                );
+    
+            node.append("circle")
+                .attr("r", 5)
+                .style("fill", function (d, i) {return colors(i);})
+    
+            node.append("title")
+                .text(function (d) {return d.id;});
+    
+            node.append("text")
+                .attr("dy", -3)
+                .text(function (d) {return d.name;});
+    
+            simulation
+                .nodes(nodes)
+                .on("tick", ticked);
+    
+            simulation.force("link")
+                .links(links);
+        }
+    
+        function ticked() {
+            link
+                .attr("x1", function (d) {return d.source.x;})
+                .attr("y1", function (d) {return d.source.y;})
+                .attr("x2", function (d) {return d.target.x;})
+                .attr("y2", function (d) {return d.target.y;});
+    
+            node
+                .attr("transform", function (d) {return "translate(" + d.x + ", " + d.y + ")";});
+    
+            edgepaths.attr('d', function (d) {
+                return 'M ' + d.source.x + ' ' + d.source.y + ' L ' + d.target.x + ' ' + d.target.y;
+            });
+    
+            edgelabels.attr('transform', function (d) {
+                if (d.target.x < d.source.x) {
+                    var bbox = this.getBBox();
+    
+                    rx = bbox.x + bbox.width / 2;
+                    ry = bbox.y + bbox.height / 2;
+                    return 'rotate(180 ' + rx + ' ' + ry + ')';
+                }
+                else {
+                    return 'rotate(0)';
+                }
+            });
+        }
+    
+        function dragstarted(d) {
+            if (!d3.event.active) simulation.alphaTarget(0.3).restart()
+            d.fx = d.x;
+            d.fy = d.y;
+        }
+    
+        function dragged(d) {
+            d.fx = d3.event.x;
+            d.fy = d3.event.y;
+        }
+    
+        function render_settings(nodes, selected){
+
+            var shtml = '<div class="row">';
+            for (const node of nodes) { 
+                let checked = selected.some(el => (el.id === node.id));
+                shtml += `<div class="col-4">
+                        <div class="form-check">
+                            <input class="form-check-input" id="${node.id}" type="checkbox" value="${node.id}" ${ checked ? 'checked="checked"' : ''}>
+                            <label class="form-check-label" for="${node.id}">
+                                ${node.name}
+                            </label>
+                            <span class="badge rounded-pill bg-info text-dark">${node.referenceCount}</span>
+                        </div>
+                    </div>`;
+            }
+
+            shtml +=  '</div>';
+
+            $('#settings').html(shtml);
+        }
+
+        function retrieve_selected(){
+            let selected_node_ids = $("#settingsForm input:checkbox:checked").map(function(){
+                                                                            return $(this).val();
+                                                                            }).get();
+
+                var selected_nodes = gNodes.filter(node => selected_node_ids.some(node_id => node.id == node_id));
+
+                // remove link.source and link.target that is not present in selected nodes
+                var selected_links = gLinks.filter(link => selected_nodes.some(node => link.source == node.id));
+                    selected_links = selected_links.filter(link => selected_nodes.some(node => link.target == node.id));
+            return {
+                selected_nodes,
+                selected_links
+            };
+        }
+
+        $(function(){
+
+            var svgElt = $("svg").svgPanZoom();
+
+            $('#btnUpdateGraph').click(function(){
+                
+                let selected_node_ids = $("#settingsForm input:checkbox:checked").map(function(){
+                                                                            return $(this).val();
+                                                                            }).get();
+
+                var selected_nodes = gNodes.filter(node => selected_node_ids.some(node_id => node.id == node_id));
+                var selected_links = [];
+
+                // remove link.source and link.target that is not present in selected nodes
+                for (const link of gLinks) {
+                    if(selected_node_ids.some(node_id => node_id == link.source.id || node_id == link.source) && 
+                       selected_node_ids.some(node_id => node_id == link.target.id || node_id == link.target))
+                        selected_links.push(link);
+                }    
+
+                d3.select("svg").selectAll("*").remove();
+
+                if(selected_links.length > 0 || selected_nodes.length>0){
+                    update(selected_links, selected_nodes);
+                    simulation.restart();
+                }
+
+                $('#settingsModal').modal('hide');
+        });
+
+        $('#btnSortAmountDesc').click(function(){
+
+            var params = retrieve_selected();
+
+            gNodes.sort((a,b) => a.referenceCount - b.referenceCount );
+
+            update(params.selected_links, params.selected_nodes);
+
+            render_settings(gNodes, params.selected_nodes);
+
+        });
+
+        $('#btnSortAmountAsc').click(function(){
+
+            var params = retrieve_selected();
+
+            gNodes.sort((a,b) => b.referenceCount - a.referenceCount );
+
+            update(params.selected_links, params.selected_nodes);
+
+            render_settings(gNodes, params.selected_nodes);
+
+        });
+
+        $('#btnSortAlphaDesc').click(function(){
+
+            var params = retrieve_selected();
+
+            gNodes.sort((a,b) => (a.id < b.id) ? 1 : ((b.id < a.id) ? -1 : 0))
+
+            update(params.selected_links, params.selected_nodes);
+
+            render_settings(gNodes, params.selected_nodes);
+
+        });
+
+        $('#btnSortAlphaAsc').click(function(){
+
+            var params = retrieve_selected();
+
+            gNodes.sort((a,b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0))
+
+            update(params.selected_links, params.selected_nodes);
+
+            render_settings(gNodes, params.selected_nodes);
+
+        });
+
+        $('#txtFilter').keyup(function (e) { 
+
+            var val = $('#txtFilter').val();
+
+            $("#settingsForm input[type=checkbox]").parent().parent().show();
+
+            if(val.length > 0)
+                $("#settingsForm input:not([value^="+ val+"])").parent().parent().hide();
+
+        });
+
+        $('#btnSelectAll').click(function(){
+            $('#settingsForm input[type=checkbox]').prop('checked', true);
+         });
+
+         $('#btnUnselectAll').click(function(){
+            $('#settingsForm input[type=checkbox]').prop('checked', false);
+         });
+
+
+         $('#btnUp').click(function(){ svgElt.panUp()});
+         $('#btnDown').click(function(){ svgElt.panDown()});
+         $('#btnLeft').click(function(){ svgElt.panLeft()});
+         $('#btnRight').click(function(){ svgElt.panRight()});
+         $('#btnZoomIn').click(function(){ svgElt.zoomIn()});
+         $('#btnZoomOut').click(function(){ svgElt.zoomOut()});
+         $('#btnRefresh').click(function(){ svgElt.reset()});
+
+        // start 
+        init();
+
+        });
+    </script>
+
+    <!-- Modal -->
+    <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="settingsModalLabel">Graph Settings</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <div class='row g-0 mb-5'>
+                        <div class='col-md-5 w-auto ms-auto'>
+                            <div class="btn-toolbar" role="toolbar">
+                                <div class="input-group mx-2">
+                                    <input type="text" class="form-control" id="txtFilter">
+                                </div>
+                                <div class="btn-group me-2" role="group">
+                                    <button type="button" class="btn btn-secondary" id="btnSortAmountDesc"><i class="fa fa-sort-numeric-desc" aria-hidden="true"></i></button>
+                                    <button type="button" class="btn btn-secondary" id="btnSortAmountAsc"><i class="fa fa-sort-numeric-asc" aria-hidden="true"></i></button>
+                                    <button type="button" class="btn btn-secondary" id="btnSortAlphaAsc"><i class="fa fa-sort-alpha-asc" aria-hidden="true"></i></button>
+                                    <button type="button" class="btn btn-secondary" id="btnSortAlphaDesc"><i class="fa fa-sort-alpha-desc" aria-hidden="true"></i></button>
+                                </div>
+
+                                <div class="btn-group me-2" role="group">
+                                    <button type="button" class="btn btn-secondary" id="btnSelectAll"><i class="fa fa-check" aria-hidden="true"></i></button>
+                                    <button type="button" class="btn btn-secondary" id="btnUnselectAll"><i class="fa fa-times" aria-hidden="true"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form id="settingsForm">
+                        <div id="settings" class="container m-t-5">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" id="btnUpdateGraph" class="btn btn-primary">Update Graph</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    </body>
+    </html>
+
+
+
