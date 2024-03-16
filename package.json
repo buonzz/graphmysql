@@ -1,6 +1,6 @@
 {
   "name": "graphmysql",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Display MySQL objects in a graph",
   "keywords": [
     "oclif"
