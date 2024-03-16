@@ -75,6 +75,7 @@
 
         var gNodes = structuredClone(data.nodes);
         var gLinks = structuredClone(data.links);
+        var gDependencies = structuredClone(data.dependencies);
 
         var colors = d3.scaleOrdinal(d3.schemeCategory10);
     
@@ -264,6 +265,13 @@
             };
         }
 
+        function update_checkboxes(items) {
+            var selector_array = items.map(function(item) {
+                return `input[value=${item}]:not(:checked)`;
+            });
+            $(selector_array.join(", ")).prop('checked', true);
+        }
+
         $(function(){
 
             var svgElt = $("svg").svgPanZoom();
@@ -370,6 +378,18 @@
          $('#btnZoomOut').click(function(){ svgElt.zoomOut()});
          $('#btnRefresh').click(function(){ svgElt.reset()});
 
+         $('#btnSelectDependencies').click(function(){
+            let selected_node_ids = $("#settingsForm input:checkbox:checked").map(function(){
+                                                                            return $(this).val();
+                                                                            }).get();
+            
+             for (const cur_node of selected_node_ids){
+                if(gDependencies[cur_node] != undefined)
+                     update_checkboxes(gDependencies[cur_node]);
+             }
+
+         });
+
         // start 
         init();
 
@@ -402,6 +422,7 @@
                                 <div class="btn-group me-2" role="group">
                                     <button type="button" class="btn btn-secondary" id="btnSelectAll"><i class="fa fa-check" aria-hidden="true"></i></button>
                                     <button type="button" class="btn btn-secondary" id="btnUnselectAll"><i class="fa fa-times" aria-hidden="true"></i></button>
+                                    <button type="button" class="btn btn-secondary" id="btnSelectDependencies"><i class="fa fa-sitemap" aria-hidden="true"></i></button>
                                 </div>
                             </div>
                         </div>
