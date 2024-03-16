@@ -75,116 +75,161 @@
     <script type="text/javascript">
 
         var data = {
+    "dependencies": {
+        "address": [
+            "city"
+        ],
+        "city": [
+            "country"
+        ],
+        "customer": [
+            "address",
+            "store"
+        ],
+        "film": [
+            "language"
+        ],
+        "film_actor": [
+            "actor",
+            "film"
+        ],
+        "film_category": [
+            "category",
+            "film"
+        ],
+        "inventory": [
+            "film",
+            "store"
+        ],
+        "payment": [
+            "customer",
+            "rental",
+            "staff"
+        ],
+        "rental": [
+            "customer",
+            "inventory",
+            "staff"
+        ],
+        "staff": [
+            "address",
+            "store"
+        ],
+        "store": [
+            "address",
+            "staff"
+        ]
+    },
     "links": [
         {
             "source": "address",
             "target": "city",
-            "type": "city_id = city_id"
+            "type": "address.city_id = city.city_id"
         },
         {
             "source": "city",
             "target": "country",
-            "type": "country_id = country_id"
+            "type": "city.country_id = country.country_id"
         },
         {
             "source": "customer",
             "target": "address",
-            "type": "address_id = address_id"
+            "type": "customer.address_id = address.address_id"
         },
         {
             "source": "customer",
             "target": "store",
-            "type": "store_id = store_id"
+            "type": "customer.store_id = store.store_id"
         },
         {
             "source": "film",
             "target": "language",
-            "type": "language_id = language_id"
+            "type": "film.language_id = language.language_id"
         },
         {
             "source": "film",
             "target": "language",
-            "type": "original_language_id = language_id"
+            "type": "film.original_language_id = language.language_id"
         },
         {
             "source": "film_actor",
             "target": "actor",
-            "type": "actor_id = actor_id"
+            "type": "film_actor.actor_id = actor.actor_id"
         },
         {
             "source": "film_actor",
             "target": "film",
-            "type": "film_id = film_id"
+            "type": "film_actor.film_id = film.film_id"
         },
         {
             "source": "film_category",
             "target": "category",
-            "type": "category_id = category_id"
+            "type": "film_category.category_id = category.category_id"
         },
         {
             "source": "film_category",
             "target": "film",
-            "type": "film_id = film_id"
+            "type": "film_category.film_id = film.film_id"
         },
         {
             "source": "inventory",
             "target": "film",
-            "type": "film_id = film_id"
+            "type": "inventory.film_id = film.film_id"
         },
         {
             "source": "inventory",
             "target": "store",
-            "type": "store_id = store_id"
+            "type": "inventory.store_id = store.store_id"
         },
         {
             "source": "payment",
             "target": "customer",
-            "type": "customer_id = customer_id"
+            "type": "payment.customer_id = customer.customer_id"
         },
         {
             "source": "payment",
             "target": "rental",
-            "type": "rental_id = rental_id"
+            "type": "payment.rental_id = rental.rental_id"
         },
         {
             "source": "payment",
             "target": "staff",
-            "type": "staff_id = staff_id"
+            "type": "payment.staff_id = staff.staff_id"
         },
         {
             "source": "rental",
             "target": "customer",
-            "type": "customer_id = customer_id"
+            "type": "rental.customer_id = customer.customer_id"
         },
         {
             "source": "rental",
             "target": "inventory",
-            "type": "inventory_id = inventory_id"
+            "type": "rental.inventory_id = inventory.inventory_id"
         },
         {
             "source": "rental",
             "target": "staff",
-            "type": "staff_id = staff_id"
+            "type": "rental.staff_id = staff.staff_id"
         },
         {
             "source": "staff",
             "target": "address",
-            "type": "address_id = address_id"
+            "type": "staff.address_id = address.address_id"
         },
         {
             "source": "staff",
             "target": "store",
-            "type": "store_id = store_id"
+            "type": "staff.store_id = store.store_id"
         },
         {
             "source": "store",
             "target": "address",
-            "type": "address_id = address_id"
+            "type": "store.address_id = address.address_id"
         },
         {
             "source": "store",
             "target": "staff",
-            "type": "manager_staff_id = staff_id"
+            "type": "store.manager_staff_id = staff.staff_id"
         }
     ],
     "nodes": [
@@ -309,6 +354,7 @@
 
         var gNodes = structuredClone(data.nodes);
         var gLinks = structuredClone(data.links);
+        var gDependencies = structuredClone(data.dependencies);
 
         var colors = d3.scaleOrdinal(d3.schemeCategory10);
     
@@ -498,6 +544,13 @@
             };
         }
 
+        function update_checkboxes(items) {
+            var selector_array = items.map(function(item) {
+                return `input[value=${item}]:not(:checked)`;
+            });
+            $(selector_array.join(", ")).prop('checked', true);
+        }
+
         $(function(){
 
             var svgElt = $("svg").svgPanZoom();
@@ -604,6 +657,23 @@
          $('#btnZoomOut').click(function(){ svgElt.zoomOut()});
          $('#btnRefresh').click(function(){ svgElt.reset()});
 
+         $('#btnSelectDependencies').click(function(){
+            let selected_node_ids = $("#settingsForm input:checkbox:checked").map(function(){
+                                                                            return $(this).val();
+                                                                            }).get();
+            
+             for (const cur_node of selected_node_ids){
+                if(gDependencies[cur_node] != undefined)
+                     update_checkboxes(gDependencies[cur_node]);
+             }
+
+         });
+
+         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+
         // start 
         init();
 
@@ -627,15 +697,16 @@
                                     <input type="text" class="form-control" id="txtFilter">
                                 </div>
                                 <div class="btn-group me-2" role="group">
-                                    <button type="button" class="btn btn-secondary" id="btnSortAmountDesc"><i class="fa fa-sort-numeric-desc" aria-hidden="true"></i></button>
-                                    <button type="button" class="btn btn-secondary" id="btnSortAmountAsc"><i class="fa fa-sort-numeric-asc" aria-hidden="true"></i></button>
-                                    <button type="button" class="btn btn-secondary" id="btnSortAlphaAsc"><i class="fa fa-sort-alpha-asc" aria-hidden="true"></i></button>
-                                    <button type="button" class="btn btn-secondary" id="btnSortAlphaDesc"><i class="fa fa-sort-alpha-desc" aria-hidden="true"></i></button>
+                                    <button type="button" class="btn btn-secondary" id="btnSortAmountDesc" data-bs-toggle="tooltip" data-bs-placement="right" title="Sort checkboxes by number of tables referencing it, highest to lowest"><i class="fa fa-sort-numeric-desc" aria-hidden="true"></i></button>
+                                    <button type="button" class="btn btn-secondary" id="btnSortAmountAsc" data-bs-toggle="tooltip" data-bs-placement="right" title="Sort checkboxes by number of tables referencing it, lowest to highest"><i class="fa fa-sort-numeric-asc" aria-hidden="true"></i></button>
+                                    <button type="button" class="btn btn-secondary" id="btnSortAlphaAsc" data-bs-toggle="tooltip" data-bs-placement="right" title="Sort checkboxes by alphabetical order, ascending"><i class="fa fa-sort-alpha-asc" aria-hidden="true"></i></button>
+                                    <button type="button" class="btn btn-secondary" id="btnSortAlphaDesc" data-bs-toggle="tooltip" data-bs-placement="right" title="Sort checkboxes by alphabetical order, descending"><i class="fa fa-sort-alpha-desc" aria-hidden="true"></i></button>
                                 </div>
 
                                 <div class="btn-group me-2" role="group">
-                                    <button type="button" class="btn btn-secondary" id="btnSelectAll"><i class="fa fa-check" aria-hidden="true"></i></button>
-                                    <button type="button" class="btn btn-secondary" id="btnUnselectAll"><i class="fa fa-times" aria-hidden="true"></i></button>
+                                    <button type="button" class="btn btn-secondary" id="btnSelectAll" data-bs-toggle="tooltip" data-bs-placement="right" title="Select all checkboxes"><i class="fa fa-check" aria-hidden="true"></i></button>
+                                    <button type="button" class="btn btn-secondary" id="btnUnselectAll" data-bs-toggle="tooltip" data-bs-placement="right" title="Unselect all checkboxes"><i class="fa fa-times" aria-hidden="true"></i></button>
+                                    <button type="button" class="btn btn-secondary" id="btnSelectDependencies" data-bs-toggle="tooltip" data-bs-placement="right" title="Select other tables which currently selected tables depends to"><i class="fa fa-sitemap" aria-hidden="true"></i></button>
                                 </div>
                             </div>
                         </div>
@@ -656,6 +727,3 @@
     
     </body>
     </html>
-
-
-
