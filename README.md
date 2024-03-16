@@ -1,7 +1,34 @@
 graphmysql
 =================
 
-Display MySQL objects and their relationship in a graph.
+Read and Display MySQL objects and their relationship in a force-directed graph.
+
+## Demo
+
+MySQL have a sample database called **sakila** and the demo below is the the result of analyzing the `information_schema`
+
+[Sakila DEMO](https://www.darwinbiler.com/graphmysql/)
+
+
+## Why 
+
+There are already tools that can read Entity-Relationship Diagrams and display the cardinality and foreign keys of each objects. The problem with ERD is once the number of tables got higher than 20 or so, displaying such diagram can be hard to read.
+
+`graphmysql` addresses this problem by only displaying the table names as circles, then the relationship as lines. This gives you a gist of which tables is connected to which in lets say a 100+ tables database. The interactivity it also provides natural way of "weeding" out unrelated tables by dragging away the node from the majority through force-directed graphs.
+
+This tool is useful for the following use-cases:
+* Getting an overview of how each tables is all related in the big picture
+* Change management - if you drop a certain table, which ones will be affected
+* Partial Updating/Resetting of database - if the production data is very huge, grabbing an entire db dump might not be ideal, determining only related tables is more practical.
+* Share with backend developer the relationship of each tables (table names, foreign keys) in order to create Models in (MVC).
+* Non-technical tool to communicate business objects with stakeholders. 
+
+## Requirements
+
+* MySQL Server 5.7 or higher
+* NodeJS 18 or higher
+
+
 
 <!-- toc -->
 * [Usage](#usage)
