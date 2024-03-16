@@ -390,6 +390,11 @@
 
          });
 
+         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+
         // start 
         init();
 
@@ -413,16 +418,16 @@
                                     <input type="text" class="form-control" id="txtFilter">
                                 </div>
                                 <div class="btn-group me-2" role="group">
-                                    <button type="button" class="btn btn-secondary" id="btnSortAmountDesc"><i class="fa fa-sort-numeric-desc" aria-hidden="true"></i></button>
-                                    <button type="button" class="btn btn-secondary" id="btnSortAmountAsc"><i class="fa fa-sort-numeric-asc" aria-hidden="true"></i></button>
-                                    <button type="button" class="btn btn-secondary" id="btnSortAlphaAsc"><i class="fa fa-sort-alpha-asc" aria-hidden="true"></i></button>
-                                    <button type="button" class="btn btn-secondary" id="btnSortAlphaDesc"><i class="fa fa-sort-alpha-desc" aria-hidden="true"></i></button>
+                                    <button type="button" class="btn btn-secondary" id="btnSortAmountDesc" data-bs-toggle="tooltip" data-bs-placement="right" title="Sort checkboxes by number of tables referencing it, highest to lowest"><i class="fa fa-sort-numeric-desc" aria-hidden="true"></i></button>
+                                    <button type="button" class="btn btn-secondary" id="btnSortAmountAsc" data-bs-toggle="tooltip" data-bs-placement="right" title="Sort checkboxes by number of tables referencing it, lowest to highest"><i class="fa fa-sort-numeric-asc" aria-hidden="true"></i></button>
+                                    <button type="button" class="btn btn-secondary" id="btnSortAlphaAsc" data-bs-toggle="tooltip" data-bs-placement="right" title="Sort checkboxes by alphabetical order, ascending"><i class="fa fa-sort-alpha-asc" aria-hidden="true"></i></button>
+                                    <button type="button" class="btn btn-secondary" id="btnSortAlphaDesc" data-bs-toggle="tooltip" data-bs-placement="right" title="Sort checkboxes by alphabetical order, descending"><i class="fa fa-sort-alpha-desc" aria-hidden="true"></i></button>
                                 </div>
 
                                 <div class="btn-group me-2" role="group">
-                                    <button type="button" class="btn btn-secondary" id="btnSelectAll"><i class="fa fa-check" aria-hidden="true"></i></button>
-                                    <button type="button" class="btn btn-secondary" id="btnUnselectAll"><i class="fa fa-times" aria-hidden="true"></i></button>
-                                    <button type="button" class="btn btn-secondary" id="btnSelectDependencies"><i class="fa fa-sitemap" aria-hidden="true"></i></button>
+                                    <button type="button" class="btn btn-secondary" id="btnSelectAll" data-bs-toggle="tooltip" data-bs-placement="right" title="Select all checkboxes"><i class="fa fa-check" aria-hidden="true"></i></button>
+                                    <button type="button" class="btn btn-secondary" id="btnUnselectAll" data-bs-toggle="tooltip" data-bs-placement="right" title="Unselect all checkboxes"><i class="fa fa-times" aria-hidden="true"></i></button>
+                                    <button type="button" class="btn btn-secondary" id="btnSelectDependencies" data-bs-toggle="tooltip" data-bs-placement="right" title="Select other tables which currently selected tables depends to"><i class="fa fa-sitemap" aria-hidden="true"></i></button>
                                 </div>
                             </div>
                         </div>
