@@ -51,6 +51,10 @@ export default class Explore extends Command {
       self.findIndex(v => v.id === value.id && v.name === value.name) === index
     );
 
+    // dependencies
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const nodeDependencies:any = {};
+
     // retrieve all constraints
     const [constraintsRes] = await conn.query(`SELECT i.TABLE_NAME, k.COLUMN_NAME, k.REFERENCED_TABLE_NAME, k.REFERENCED_COLUMN_NAME 
             FROM information_schema.TABLE_CONSTRAINTS i 
@@ -68,8 +72,14 @@ export default class Explore extends Command {
           "type": `${constraint.TABLE_NAME + '.' + constraint.COLUMN_NAME} = ${constraint.REFERENCED_TABLE_NAME +'.'+constraint.REFERENCED_COLUMN_NAME}`
         });
       }
-    }
 
+        // retrieve list of dependencies of each node
+        if(nodeDependencies[constraint.TABLE_NAME] === undefined)
+          nodeDependencies[constraint.TABLE_NAME] = [constraint.REFERENCED_TABLE_NAME];
+        else if(!nodeDependencies[constraint.TABLE_NAME].includes(constraint.REFERENCED_TABLE_NAME))
+          nodeDependencies[constraint.TABLE_NAME].push(constraint.REFERENCED_TABLE_NAME);
+
+    }
 
      // retrieve references count
      const [referencesRes] = await conn.query(`SELECT k.REFERENCED_TABLE_NAME,  count(*) as ref_count 
@@ -89,8 +99,8 @@ export default class Explore extends Command {
     // sort nodes by referenceCount desc
     uniqueNodes.sort((a,b) => b.referenceCount - a.referenceCount );
 
-
     this.log(JSON.stringify({
+      "dependencies": nodeDependencies,
       links,
       "nodes": uniqueNodes
     }, null, 4));
