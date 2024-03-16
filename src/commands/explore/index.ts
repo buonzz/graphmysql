@@ -65,7 +65,7 @@ export default class Explore extends Command {
         links.push({
           "source": constraint.TABLE_NAME,
           "target": constraint.REFERENCED_TABLE_NAME,
-          "type": `${constraint.COLUMN_NAME} = ${constraint.REFERENCED_COLUMN_NAME}`
+          "type": `${constraint.TABLE_NAME + '.' + constraint.COLUMN_NAME} = ${constraint.REFERENCED_TABLE_NAME +'.'+constraint.REFERENCED_COLUMN_NAME}`
         });
       }
     }
